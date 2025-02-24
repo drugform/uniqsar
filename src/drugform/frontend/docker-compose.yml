@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+  mol-client:
+    container_name: mol-client
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "1337:80"

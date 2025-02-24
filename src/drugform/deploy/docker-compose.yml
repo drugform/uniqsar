@@ -1,0 +1,273 @@
+version: "3"
+
+services:
+  registry:
+    build:
+      context: ..
+      dockerfile: registry/Dockerfile
+    command: python -u run.py
+    environment:
+      - DF_REGISTRY_ENDPOINT=tcp://${CPU_HOST}:${REGISTRY_PORT}
+      - DF_DB_ADDRESS=mongodb://${CPU_HOST}:${DB_PORT}     
+      - MKL_NUM_THREADS=4
+    depends_on:
+      - db
+    network_mode: host
+
+  db:
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ../db:/data/db
+    command: 
+      - '--logpath'
+      - '/var/log/mongodb/mongod.log'
+    network_mode: host
+
+  backend:
+    build:
+      context: ../
+      dockerfile: backend/Dockerfile
+    command: python -u run.py
+    environment:
+      - DF_REGISTRY_ENDPOINT=tcp://${CPU_HOST}:${REGISTRY_PORT}
+      - DF_BACKEND_ADDRESS=http://${CPU_HOST}:${BACKEND_PORT}
+      - DF_DB_ADDRESS=mongodb://${CPU_HOST}:${DB_PORT}
+      - MKL_NUM_THREADS=4
+      - DF_BACKEND_DEBUG=true
+    depends_on:
+      - registry
+      - db
+    network_mode: "host"
+
+  frontend:
+    build:
+      context: ../
+      dockerfile: frontend/Dockerfile
+#    depends_on:
+#      - registry
+#      - db
+#      - backend
+    network_mode: "host"
+
+  fastprops:
+    build:
+      context: ../../
+      dockerfile: fastprops/Dockerfile
+    command: python -u run.py
+    environment:
+      - DF_REGISTRY_ENDPOINT=tcp://${CPU_HOST}:${REGISTRY_PORT}
+      - DF_SERVICE_ENDPOINT=tcp://${CPU_HOST}:${FASTPROPS_PORT}
+      - MKL_NUM_THREADS=4
+    depends_on:
+      - registry
+    network_mode: "host"
+
+  transforcer:
+    build:
+      context: ../../
+      dockerfile: transforcer/Dockerfile
+    command: python -u run.py
+    volumes:
+      - ../../transforcer/models:/app/models
+      - ../../transforcer/data:/app/data
+    environment:
+      - DF_REGISTRY_ENDPOINT=tcp://${CPU_HOST}:${REGISTRY_PORT}
+      - DF_SERVICE_ENDPOINT=tcp://${GPU_HOST_1}:${TRANSFORCER_PORT}
+      - DF_DB_ADDRESS=mongodb://${CPU_HOST}:${DB_PORT}
+      - MKL_NUM_THREADS=4
+      - DF_MODEL_NAME=transforcer
+    depends_on:
+      - registry
+      - db
+    network_mode: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['${TRANSFORCER_DEVICE}']
+              capabilities: [gpu]
+
+
+  # transforcer_dev:
+  #   build:
+  #     context: ../../
+  #     dockerfile: transforcer_dev/Dockerfile
+  #   command: python -u run.py
+  #   volumes:
+  #     - ../../transforcer_dev/models:/app/models
+  #     - ../../transforcer_dev/data:/app/data
+  #     - ../../transforcer_dev/src/reinforce.py:/app/src/reinforce.py
+  #     - ../../transforcer_dev/src/generator.py:/app/src/generator.py
+  #     - ../../transforcer_dev/src/leaderboard.py:/app/src/leaderboard.py
+  #   environment:
+  #     - DF_REGISTRY_ENDPOINT=tcp://${CPU_HOST}:${REGISTRY_PORT}
+  #     - DF_SERVICE_ENDPOINT=tcp://${GPU_HOST_1}:${TRANSFORCER_DEV_PORT}
+  #     - DF_DB_ADDRESS=mongodb://${CPU_HOST}:${DB_PORT}
+  #     - MKL_NUM_THREADS=4
+  #     - DF_MODEL_NAME=transforcer_dev
+  #   depends_on:
+  #     - registry
+  #     - db
+  #   network_mode: host
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             device_ids: ['${TRANSFORCER_DEV_DEVICE}']
+  #             capabilities: [gpu]
+
+  uniqsar:
+    build:
+      context: ../../
+      dockerfile: uniqsar/Dockerfile
+    volumes:
+      - ../../uniqsar/models/:/app/models
+      - ../../uniqsar/data/:/app/data
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+
+  # chemformer_legacy:
+  #   build:
+  #     context: ../../
+  #     dockerfile: encoders/chemformer/Dockerfile
+  #   command: python -u run.py
+  #   environment:
+  #     - DF_REGISTRY_ENDPOINT=tcp://${CPU_HOST}:${REGISTRY_PORT}
+  #     - DF_SERVICE_ENDPOINT=tcp://${GPU_HOST_1}:${CHEMFORMER_LEGACY_PORT}
+  #     - DF_DB_ADDRESS=mongodb://${CPU_HOST}:${DB_PORT}
+  #     - MKL_NUM_THREADS=4
+  #     - VARIANT=legacy
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             device_ids: ['${CHEMFORMER_LEGACY_DEVICE}']
+  #             capabilities: [gpu]
+  #   depends_on:
+  #     - registry
+  #     - db
+  #   network_mode: host
+
+  chemformer_light:
+    build:
+      context: ../../
+      dockerfile: encoders/chemformer/Dockerfile
+    command: python -u run.py
+    environment:
+      - DF_REGISTRY_ENDPOINT=tcp://${CPU_HOST}:${REGISTRY_PORT}
+      - DF_SERVICE_ENDPOINT=tcp://${GPU_HOST_1}:${CHEMFORMER_LIGHT_PORT}
+      - DF_DB_ADDRESS=mongodb://${CPU_HOST}:${DB_PORT}
+      - MKL_NUM_THREADS=4
+      - VARIANT=light
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['${CHEMFORMER_LIGHT_DEVICE}']
+              capabilities: [gpu]
+    depends_on:
+      - registry
+      - db
+    network_mode: host
+
+  chemformer_heavy:
+    build:
+      context: ../../
+      dockerfile: encoders/chemformer/Dockerfile
+    command: python -u run.py
+    environment:
+      - DF_REGISTRY_ENDPOINT=tcp://${CPU_HOST}:${REGISTRY_PORT}
+      - DF_SERVICE_ENDPOINT=tcp://${GPU_HOST_1}:${CHEMFORMER_HEAVY_PORT}
+      - DF_DB_ADDRESS=mongodb://${CPU_HOST}:${DB_PORT}
+      - MKL_NUM_THREADS=4
+      - VARIANT=heavy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['${CHEMFORMER_HEAVY_DEVICE}']
+              capabilities: [gpu]
+    depends_on:
+      - registry
+      - db
+    network_mode: host
+
+  # esm_legacy:
+  #   build:
+  #     context: ../../
+  #     dockerfile: encoders/esm/Dockerfile
+  #   command: python -u run.py
+  #   environment:
+  #     - DF_REGISTRY_ENDPOINT=tcp://${CPU_HOST}:${REGISTRY_PORT}
+  #     - DF_SERVICE_ENDPOINT=tcp://${GPU_HOST_1}:${ESM_LEGACY_PORT}
+  #     - DF_DB_ADDRESS=mongodb://${CPU_HOST}:${DB_PORT}
+  #     - MKL_NUM_THREADS=4
+  #     - VARIANT=legacy
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             device_ids: ['${ESM_LEGACY_DEVICE}']
+  #             capabilities: [gpu]
+  #   depends_on:
+  #     - registry
+  #     - db
+  #   network_mode: host
+
+  esm_light:
+    build:
+      context: ../../
+      dockerfile: encoders/esm/Dockerfile
+    command: python -u run.py
+    environment:
+      - DF_REGISTRY_ENDPOINT=tcp://${CPU_HOST}:${REGISTRY_PORT}
+      - DF_SERVICE_ENDPOINT=tcp://${GPU_HOST_1}:${ESM_LIGHT_PORT}
+      - DF_DB_ADDRESS=mongodb://${CPU_HOST}:${DB_PORT}
+      - MKL_NUM_THREADS=4
+      - VARIANT=light
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['${ESM_LIGHT_DEVICE}']
+              capabilities: [gpu]
+    depends_on:
+      - registry
+      - db
+    network_mode: host
+
+  esm_normal:
+    build:
+      context: ../../
+      dockerfile: encoders/esm/Dockerfile
+    command: python -u run.py
+    environment:
+      - DF_REGISTRY_ENDPOINT=tcp://${CPU_HOST}:${REGISTRY_PORT}
+      - DF_SERVICE_ENDPOINT=tcp://${GPU_HOST_1}:${ESM_NORMAL_PORT}
+      - DF_DB_ADDRESS=mongodb://${CPU_HOST}:${DB_PORT}
+      - MKL_NUM_THREADS=4
+      - VARIANT=normal
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['${ESM_NORMAL_DEVICE}']
+              capabilities: [gpu]
+    depends_on:
+      - registry
+      - db
+    network_mode: host

@@ -1,0 +1,7 @@
+,Total
+pKi (RMSE),0.39 -0.02/+0.01
+pKi (Q2),0.77
+pKi (CI),0.82
+avg_regr (RMSE),0.39 -0.02/+0.01
+avg_regr (Q2),0.77
+avg_regr (CI),0.82

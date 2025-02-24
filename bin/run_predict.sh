@@ -77,8 +77,8 @@ else
     dflag="-d"
 fi
 
-if [ -e $output_file ] ; then
-    echo Output file exists: $output_file. Delete to continue? \(y/n\)
+if [ -s $output_file ] ; then
+    echo Non-empty output file exists: $output_file. Delete to continue? \(y/n\)
     rm -ri $output_file
     if [ -e $output_file ]; then
 	echo 'Not going further until you manage the output file'

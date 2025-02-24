@@ -1,0 +1,49 @@
+.calculate {
+  &__buttons {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid gainsboro;
+  }
+  &__taskDescription {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 16px;
+  }
+
+  &__taskInfo {
+    flex: 0.3;
+
+    &__upload {
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid gainsboro;
+    }
+  }
+
+  &__taskResult {
+    flex: 1;
+  }
+
+  &__moleculaView {
+    flex: 0.4;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid gainsboro;
+
+    &__title {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 16px;
+    }
+    &__label {
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 14px;
+    }
+    &__value {
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 14px;
+    }
+  }
+}

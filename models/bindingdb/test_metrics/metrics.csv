@@ -1,0 +1,7 @@
+,Total
+pKi (RMSE),0.87 ± 0.01
+pKi (Q2),0.76
+pIC50 (RMSE),0.831 ± 0.006
+pIC50 (Q2),0.73
+avg_regr (RMSE),0.842 ± 0.006
+avg_regr (Q2),0.74

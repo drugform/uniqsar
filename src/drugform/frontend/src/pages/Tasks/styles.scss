@@ -1,0 +1,81 @@
+.tasks {
+  &__list {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid gainsboro;
+    flex: 0.3;
+  }
+
+  &__viewSelected {
+    flex: 1;
+  }
+
+  &__name {
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 14px;
+  }
+
+  &__date {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+  }
+
+  &__description {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+  }
+
+  &__item {
+    padding: 8px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
+
+    &.active {
+      background-color: #d9e2e8;
+    }
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    &:hover {
+      background-color: rgba($color: #000000, $alpha: 0.1);
+    }
+
+    &__result {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid gainsboro;
+      flex: 0.4;
+      line-height: 14px;
+
+      &__title {
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 16px;
+      }
+
+      &__description {
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 14px;
+        max-width: 440px;
+      }
+
+      &__label {
+        font-weight: 600;
+        font-size: 12px;
+        line-height: 14px;
+      }
+    }
+  }
+
+  &__info {
+    border: 1px solid gainsboro;
+    border-radius: 8px;
+    padding: 16px;
+  }
+}

@@ -2,3 +2,7 @@
 **/*~
 **/#*
 **/.ipynb_checkpoints
+
+lib/Chemformer/*
+lib/esm/*
+models/*/*.pt
