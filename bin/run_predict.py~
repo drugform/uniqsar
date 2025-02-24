@@ -1,0 +1,31 @@
+#!/bin/sh
+
+model_name=`realpath $1`
+input_file=`realpath $2`
+output_file=${input_file%.csv}_pred.csv
+devices=$3
+
+if test $# -ge 4 -a "$4" = "dev"
+then
+    echo "Interactive mode"
+    iflag="-i"
+    dflag=""
+    docker build -t uniqsar_standalone .
+else
+    iflag=""
+    dflag="-d"
+fi
+
+docker run $dflag \
+    -v $(pwd)/../models:/app/models:rw \
+    -v $(pwd)/../data:/app/data:rw \
+     -v $(pwd)/../lib:/app/lib:rw \
+    -v $input_file:/tmp/predict_input.csv:rw \
+    -v $output_file:/tmp/predict_output.csv:rw \
+     -e MKL_NUM_THREADS=4 \
+     -u $(id -u):$(id -g) \
+     --gpus \"device=${devices}\" \
+     -it uniqsar_standalone \
+     python $iflag -u predict.py \
+       /tmp/predict_input.csv \
+       /tmp/predict_output.csv
