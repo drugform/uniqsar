@@ -29,14 +29,15 @@ For UniQSAR framework:
 ```
 </details>
 
-## Setting Environment
+## Usage
+### Setting Environment
 Use the provided Dockerfile to build an environment to run prediction and training: `docker build -t Dockerfile .` 
 Of course you can use UniQSAR without docker, in that case you'll need to install the libraries from the Dockerfile manually, and also crop calling the python code from `bin/` scripts. We strongly advice to use our dockerfile, it will save you some time on combiling torch verions. For example, Chemformer do not work with pytorch 2.x, while some other libs like ESM require pytorch 2.x unless you tell them manually not to use it.
 
-## Obtaining the Data
-Trained models, external libs like Chemformer, and datasets are large files. Github cannot handle it even with the LFS module installed. Before first use, download the files from here: `url link`. Directory structure inside the archive matches the code structure, so just unpack it in the root dir: `command here`.
+### Obtaining the Data
+Trained models, external libs like Chemformer, and datasets are large files. Github cannot handle it even with the LFS module installed. Before first use, download the files from here: `zenodo link`. Directory structure inside the archive matches the code structure, so just unpack it in the root dir: `command here`.
 
-## Using a Trained Model
+### Using a Trained Model
 Use `bin/run_predict.sh` to predict values with a trained model. Run the script without args to get help. Basically, you have to provide model name and input file, but there are some more details.
 
 1. `-m, --model-name` — name of the trained model, as it appears in `models/` directory
@@ -52,3 +53,11 @@ An example of running a prediciton with the DTA model:
 
 It will return an id of a docker container, where the prediction is running. You can check the progress with `docker logs $id$` command. After it finishes, check `/tmp/output_test.csv` for prediction results.
 
+### Training own QSAR model.
+You can train own models with `bin/run_train.sh`. Run the script without args to get help. For example, to train a DTA model on the KIBA benchmark, you need to run the command:
+
+`bin/run_train.sh --config-file train_scripts/kiba.py --gpus 0,1`
+
+It will run the training in a docker container, and give you its id, so you can later check the progress with `docker logs`. If --gpus argument not given, it will run the training on the CPU. Most likely, you do not want this, unless you need to debug something. Training a real-life model on CPU will take almost a hole life time.
+
+Use --dev-mode key argument to run an interactive docker session (probably you do not need that too).
