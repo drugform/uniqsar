@@ -6,8 +6,21 @@ from tqdm import tqdm
 from argparse import Namespace
 
 _CF_DIR_ = "../lib/Chemformer"
-sys.path.append(os.path.join(_CF_DIR_, 'src'))
 
+def maybe_download_chemformer_code ():
+    url = "https://github.com/MolecularAI/Chemformer"
+    commit_hash = "a779f6e"
+    path = os.path.join(_CF_DIR_, 'src')
+    if os.path.exists(path):
+        return
+
+    print("No local Chemformer code, trying to download")
+    os.system(f"git clone {url} {path}")
+    os.system(f"git -C {path} checkout {commit_hash}")
+
+maybe_download_chemformer_code()
+
+sys.path.append(os.path.join(_CF_DIR_, 'src'))
 from molbart.modules.data.util import BatchEncoder
 from molbart.models import Chemformer
 import molbart.modules.util as util
@@ -26,9 +39,26 @@ class Encoder ():
         self.maxlen = 512-2
         self.batch_size = batch_size
         self.load_model(variant)
+
+    def check_model_file (self, variant, model_path):
+        source_url = "https://az.app.box.com/s/7eci3nd9vy0xplqniitpk02rbg9q2zcq/file/854845339754"
+        if variant == 'light':
+            src = "models/pre-trained/combined/step=1000000.ckpt"
+            dest = "lib/Chemformer/models/combined.ckpt"
+        elif variant == 'heavy':
+            src = "models/pre-trained/combined-large/step=1000000.ckpt"
+            dest = "lib/Chemformer/models/combined_large.ckpt"
+            
+        if not os.path.exists(model_path):
+            raise Exception(f'Chemformer model file not found. You need to manually download file "{src}" from "{source_url}" in browser and put it locally as "{dest}"')  
+
+    def fix_vocab_size_param (self, path):
+        model = torch.load(path)
+        model["hyper_parameters"]["vocabulary_size"] = model["hyper_parameters"]["vocab_size"]
+        torch.save(model, path)
+        del model
         
     def load_model (self, variant):
-        print()
         print(f"Loading Chemformer encoder:")
         print(f"variant={variant}")
         print(f"device={self.device}")
@@ -48,7 +78,9 @@ class Encoder ():
             self.maxlen = 512-2
         else:
             raise Exception(f'Unknown variant: {variant}. Expected one of: light, heavy')
-            
+        self.check_model_file(variant, args.model_path)
+        self.fix_vocab_size_param(args.model_path)
+        
         model_args, data_args = util.get_chemformer_args(args)
         
         kwargs = {
@@ -64,6 +96,7 @@ class Encoder ():
             "device" : self.device
         }
 
+        
         self.cmf = Chemformer(**kwargs)
         del self.cmf.model.decoder
         torch.cuda.empty_cache()

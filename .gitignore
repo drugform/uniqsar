@@ -3,6 +3,5 @@
 **/#*
 **/.ipynb_checkpoints
 
-lib/Chemformer/*
-lib/esm/*
+lib/*
 models/*/*.pt
