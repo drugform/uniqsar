@@ -63,7 +63,7 @@ then
     echo "Interactive mode"
     iflag="-i"
     dflag=""
-    docker build -t uniqsar_standalone .
+    docker build -t uniqsar .
 else
     iflag=""
     dflag="-d"
@@ -77,7 +77,7 @@ command="docker run $dflag
      -e MKL_NUM_THREADS=4
      -u $(id -u):$(id -g)
      --gpus \"device=${gpus}\"
-     -it uniqsar_standalone
+     -it uniqsar
      python $iflag -u train.py"
 
 printf "$command\n"
