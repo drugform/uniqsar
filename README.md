@@ -45,13 +45,12 @@ The Chemformer code will also be downloaded and cached at the first run, checkou
 So basically you need to put by hands only the `combined.pt` file.
 
 ### Obtaining the data
-Trained models and datasets are large files. Github cannot handle it even with the LFS module installed. Before first use, download the files from here: `zenodo link`. Directory structure inside the archive matches the code structure, so just unpack it in the root dir. Full command list to obtain the code and the data is the following:
+Trained models and datasets are large files. Github cannot handle it even with the LFS module installed. Before first use, download the archive `drugform-dta_data.tar.gz` from here: `https://zenodo.org/uploads/14949570` (doi: 10.5281/zenodo.14949570). Directory structure inside the archive matches the code structure. Full command list to merge the code and the data is the following:
 
 ```
 $ git clone https://github.com/drugform/uniqsar
 ### until the article is not puclished, this github repo is private, so use an early access token to clone the repo: 
 $ git clone https://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@github.com/drugform/uniqsar
-$ wget $(zenodo link)drugform-dta_data.tar.gz
 $ tar xvf drugform-dta_data.tar.gz
 $ cp -r drugform-dta_data/uniqsar/* uniqsar/
 $ rm -r drugform-dta_data
