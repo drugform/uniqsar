@@ -41,7 +41,7 @@ class Encoder ():
         self.load_model(variant)
 
     def check_model_file (self, variant, model_path):
-        source_url = "https://az.app.box.com/s/7eci3nd9vy0xplqniitpk02rbg9q2zcq/file/854845339754"
+        source_url = "https://az.box.com/s/7eci3nd9vy0xplqniitpk02rbg9q2zcq"
         if variant == 'light':
             src = "models/pre-trained/combined/step=1000000.ckpt"
             dest = "lib/Chemformer/models/combined.ckpt"
