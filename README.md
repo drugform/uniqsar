@@ -32,10 +32,28 @@ For UniQSAR framework:
 ## Usage
 ### Setting environment
 Use the provided Dockerfile to build an environment to run prediction and training: `docker build -t Dockerfile .` 
-Of course you can use UniQSAR without docker, in that case you'll need to install the libraries from the Dockerfile manually, and also crop calling the python code from `bin/` scripts. We strongly advice to use our dockerfile, it will save you some time on combiling torch verions. For example, Chemformer do not work with pytorch 2.x, while some other libs like ESM require pytorch 2.x unless you tell them manually not to use it.
+
+Of course you can use UniQSAR without docker, in that case you'll need to install the libraries from the Dockerfile manually, and also crop calling the python code from `bin/` scripts. We strongly advice to use our dockerfile, it will save you some time on combining torch verions. For example, Chemformer do not work with pytorch 2.x, while some other libs like ESM require pytorch 2.x unless you tell them manually not to use it.
+
+### Obtaining the libraries
+Curently the project uses Chemformer to encode small molecules and ESM to encode amino acid sequences. Their code is not included in this repository.
+
+The ESM code and model will be downloaded and cached automatically after the first run, you do not need to do a thing about it. If something went wrong or running the code indicates problems with the ESM model, delete the `lib/esm` directory and try again. Finally it must contain esm repository content in `esm/lib/facebookresearch_esm_main` and `esm/lib/checkpoints/esm2_t30_150M_UR50D.pt` file. 
+
+The Chemformer code will also be downloaded and cached at the first run, checkouting the specific commit in the repo, so the future changes in the 3rd-party repository do not affect the compartibility. Unfortunately, Chemformer model files cannot be downloaded automatically, you have to download it manually from the web page, given in their work: https://az.app.box.com/s/7eci3nd9vy0xplqniitpk02rbg9q2zcq. Download the `models/pre-trained/combined/step=1000000.ckpt` file from there and put it to `lib/Chemformer/models/combined.ckpt`. If you need the `combined_large` model, download the `models/pre-trained/combined-large/step=1000000.ckpt` file from there and put it to `lib/Chemformer/models/combined_large.ckpt`. The models are converted into their new format automatically, you do not have to do it manually.
+
+So basically you need to put by hands only the `combined.pt` file.
 
 ### Obtaining the data
-Trained models, external libs like Chemformer, and datasets are large files. Github cannot handle it even with the LFS module installed. Before first use, download the files from here: `zenodo link`. Directory structure inside the archive matches the code structure, so just unpack it in the root dir: `command here`.
+Trained models and datasets are large files. Github cannot handle it even with the LFS module installed. Before first use, download the files from here: `zenodo link`. Directory structure inside the archive matches the code structure, so just unpack it in the root dir. Full command list to obtain the code and the data is the following:
+
+```
+$ git clone https://github.com/drugform/uniqsar
+$ wget $(zenodo link)drugform-dta_data.tar.gz
+$ tar xvf drugform-dta_data.tar.gz
+$ cp -r drugform-dta_data/uniqsar/* uniqsar/
+$ rm -r drugform-dta_data
+```
 
 ### Using a trained model
 Use `bin/run_predict.sh` to predict values with a trained model. Run the script without args to get help. Basically, you have to provide model name and input file, but there are some more details.
