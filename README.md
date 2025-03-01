@@ -52,7 +52,7 @@ $ git clone https://github.com/drugform/uniqsar
 ### until the article is not puclished, this github repo is private, so use an early access token to clone the repo: 
 $ git clone https://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@github.com/drugform/uniqsar
 $ tar xvf drugform-dta_data.tar.gz
-$ cp -r drugform-dta_data/uniqsar/* uniqsar/
+$ cp --verbose -r drugform-dta_data/uniqsar/* uniqsar/
 $ rm -r drugform-dta_data
 ```
 
@@ -75,7 +75,7 @@ It will return an id of a docker container, where the prediction is running. You
 ### Training own QSAR model.
 You can train own models with `bin/run_train.sh`. Run the script without args to get help. For example, to train a DTA model on the KIBA benchmark, you need to run the command:
 
-`bin/run_train.sh --config-file train_scripts/kiba.py --gpus 0,1`
+`bin/run_train.sh --config-file src/train_scripts/kiba.py --gpus 0,1`
 
 It will run the training in a docker container, and give you its id, so you can later check the progress with `docker logs`. If `--gpus` argument not given, it will run the training on the CPU. Most likely, you do not want this, unless you need to debug something. Training a real-life model on CPU will take almost a hole life time.
 
@@ -84,3 +84,4 @@ Use `--dev-mode` key argument to run an interactive docker session (probably you
 The config file may be at any path in the file system, but you are advised to put the config files to the `train_scripts` directory. The directory contains other train scripts, use them as examples to make your own one.
 
 ### Training on own dataset
+To be written
