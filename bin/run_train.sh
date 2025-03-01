@@ -58,6 +58,8 @@ check_arg ()
 check_arg config-file
 set -eu
 
+realpath $config_file
+
 if test "$dev" = "yes"
 then
     echo "Interactive mode"

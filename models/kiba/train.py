@@ -27,11 +27,11 @@ if __name__ == "__main__":
              'prot_downscale' : None},
             
             'train' :
-            {'batch_size' : 48,
+            {'batch_size' : 32,
              'n_folds' : 5,
              'train_prop' : 0.9,
-             'learning_rate' : 1e-4,
-             'n_epochs' : 100,
+             'learning_rate' : 3e-5,
+             'n_epochs' : 75,
              'n_best_nets' : 5,
              'tune' : True}}
              
