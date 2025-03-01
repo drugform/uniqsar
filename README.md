@@ -49,6 +49,8 @@ Trained models and datasets are large files. Github cannot handle it even with t
 
 ```
 $ git clone https://github.com/drugform/uniqsar
+### until the article is not puclished, this github repo is private, so use an early access token to clone the repo: 
+$ git clone https://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@github.com/drugform/uniqsar
 $ wget $(zenodo link)drugform-dta_data.tar.gz
 $ tar xvf drugform-dta_data.tar.gz
 $ cp -r drugform-dta_data/uniqsar/* uniqsar/
