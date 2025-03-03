@@ -110,7 +110,7 @@ After training finished, visit the `models/my_kiba` directory and check benchmar
 
 You can also visit the `models/kiba` directory and have a look at our results.
 
-<details><summary>Notes on Davis</summary>
+<details><summary><b>Notes on Davis</b></summary>
 Training Davis benchmark is the same, with words `kiba` replaced with `davis`. BTW we conside the Davis benchmark broken because it is 3/4 same value, so we encourage the community to work out another DTA benchmark, probably on the BindingDB basis.</details>
 
 ### Reproduce our DTA model training:
