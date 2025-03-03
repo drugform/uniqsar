@@ -73,9 +73,7 @@ class Net (nn.Module):
                   n_layers, n_prot_layers,
                   esm_variant, prot_downscale):
         super(Net, self).__init__()
-        device = 'cuda' if torch.cuda.is_available else 'cpu'
-        print(device, torch.cuda.is_available)
-        1/0
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.esm_encoder = esm.Encoder(device=device,
                                        variant=esm_variant,
                                        cached=True,

@@ -31,11 +31,10 @@ from utils import batch_split
 
 class Encoder ():
     def __init__ (self, variant, augment, minpad,
-                  device='cuda', batch_size=64,
-                  name=None):
+                  batch_size=64, name=None):
         self.augment = augment
         self.minpad = minpad
-        self.device = device
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.maxlen = 512-2
         self.batch_size = batch_size
         self.load_model(variant)
@@ -53,7 +52,7 @@ class Encoder ():
             raise Exception(f'Chemformer model file not found. You need to manually download file "{src}" from "{source_url}" in browser and put it locally as "{dest}"')  
 
     def fix_vocab_size_param (self, path):
-        model = torch.load(path)
+        model = torch.load(path, map_location='cpu')
         model["hyper_parameters"]["vocabulary_size"] = model["hyper_parameters"]["vocab_size"]
         torch.save(model, path)
         del model
@@ -73,11 +72,17 @@ class Encoder ():
 
         if variant == 'light':
             args.model_path = os.path.join(_CF_DIR_, 'models/combined.ckpt')
+            embdim = 512
+
         elif variant == 'heavy':
             args.model_path = os.path.join(_CF_DIR_, 'models/combined_large.ckpt')
+            embdim = 1024
             self.maxlen = 512-2
         else:
             raise Exception(f'Unknown variant: {variant}. Expected one of: light, heavy')
+
+        self.net_params = {'embdim' : embdim}
+
         self.check_model_file(variant, args.model_path)
         self.fix_vocab_size_param(args.model_path)
         

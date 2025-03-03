@@ -1,7 +1,6 @@
 from model import Model
 
 if __name__ == "__main__":
-    device = 'cuda:0'
     task = {'model' :
             {'descr' : "Uniqsar/protnet DAVIS benchmark model (protnet v1)",
              'name' : 'davis',
@@ -36,4 +35,4 @@ if __name__ == "__main__":
              'tune' : True}}
              
     
-    m = Model(task, device)
+    m = Model(task)

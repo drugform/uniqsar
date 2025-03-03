@@ -21,7 +21,9 @@ from model_metrics import calc_model_metrics, calc_prop_metrics, \
 from mol import Mol
 
 class Model ():
-    def __init__ (self, task, device):
+    def __init__ (self, task, device=None):
+        if device is None:
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
         set_seed(42)
         self.device = device
         self.task = task

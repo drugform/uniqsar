@@ -1,10 +1,9 @@
 from model import Model
 
 if __name__ == "__main__":
-    device = 'cuda:0'
     task = {'model' :
             {'descr' : "Uniqsar/protnet BindingDB affinity model (Ki+IC50, fairseq, updated dataset)",
-             'name' : 'bindingdb_v2',
+             'name' : 'bindingdb',
              'tags' : ['uniqsar', 'qsar', 'gpu', 'chemformer', 'esm']},
             
             'dataset' :
@@ -36,4 +35,4 @@ if __name__ == "__main__":
              'tune' : True}}
              
     
-    m = Model(task, device)
+    m = Model(task)
