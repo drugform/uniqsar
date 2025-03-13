@@ -85,3 +85,44 @@ The config file may be at any path in the file system, but you are advised to pu
 
 ### Training on own dataset
 To be written
+
+## Reproducing the Drugform-DTA article results
+
+### Use DTA model to predict values
+To predict binding affinities on your own dataset:
+
+`bin/run_predict.sh --batch-size 4 --model-name bindingdb --input-file data/bindingdb/bindingdb_test_tiny.csv --output-file /tmp/output_test.csv --gpus 0`
+
+where `data/bindingdb/bindingdb_test_tiny.csv --output-file /tmp/output_test.csv` is an very tiny example of input file. You can run at your own file, but columns 
+`smiles` and `protein` are mandatory.
+
+### Check KIBA benchmark results:
+Visit `models/kiba/model_metrics` to 
+
+### Train benchmarks:
+To train own KIBA benchmark, run the following:
+
+`cp src/train_scripts/kiba.py /tmp/my_kiba.py` \# Make a copy of train config, change model name there to `my_kiba` or whatever you want.
+
+`bin/run_train.sh --config-file /tmp/my_kiba.py --gpus 0`
+
+After training finished, visit the `models/my_kiba` directory and check benchmark results in `test_metrics` directory.
+
+You can also visit the `models/kiba` directory and have a look at our results.
+
+<details><summary><b>Notes on Davis</b></summary>
+Training Davis benchmark is the same, with words `kiba` replaced with `davis`. BTW we conside the Davis benchmark broken because it is 3/4 same value, so we encourage the community to work out another DTA benchmark, probably on the BindingDB basis.</details>
+
+### Reproduce our DTA model training:
+
+`cp src/train_scripts/bindingdb.py /tmp/my_bindinbdb.py` \# Make a copy of train config, change model name there to `my_bindingdb` or whatever you want.
+
+`bin/run_train.sh --config-file /tmp/my_bindingdb.py --gpus 0,1`
+
+Check `models/` for ongoing results (data metrics, model and test metrics, trained submodels, etc)
+
+Note 1: Prepare to wait. The training will probably take few weeks or even months, depending on your hardware. BTW you can train the submodels (CV folds) in parallel. If you run the script second time after first epoch of previous run is saved to model directory, the second run will find the fold_0.pt file and consider the fold already trained, so it will report about that and immediately start training fold_1.pt. Then you wait for the 1st epoch of fold 1 saved, and run the script again to skip fold_0 and fold_1 and jump immediately to fold_2.
+
+Note 2: Check the progress with `docker logs` If your process died while training, the model directory contains a submodel file, which is not fully trained. You have to remove the unfinished fold_X.pt and before restart. 
+
+
