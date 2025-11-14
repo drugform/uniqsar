@@ -1,0 +1,11 @@
+,Total
+selective_70 (Bal Acc),0.901 -0.003/+0.004
+selective_70 (ROC AUC),0.97
+selective_75 (Bal Acc),0.926 -0.004/+0.003
+selective_75 (ROC AUC),0.983
+selective_80 (Bal Acc),0.927 -0.005/+0.004
+selective_80 (ROC AUC),0.989
+selective_85 (Bal Acc),0.913 -0.007/+0.008
+selective_85 (ROC AUC),0.99
+avg_cls (Bal Acc),0.921 -0.003/+0.001
+avg_cls (ROC AUC),0.984
