@@ -265,18 +265,29 @@ class Model ():
         
     
     def predict_file (self, input_file, output_file, batch_size=None):
-        print()
         M,D,_,_,good_ids = read_csv(input_file,
                                     self.calc_props,
                                     self.param_props)
         Yp, ci = self.predict(M, D, batch_size)
         out = {'mol_id' : good_ids}
-        for i,prop in enumerate(self.props):
+        for i,prop in enumerate(self.calc_props):
             prec = self.metrics[prop][0]['precision']
             out[prop] = Yp[:,i].round(prec)
+        for prop in self.deriv_props.keys():
+            deriv_vals = []
+            for mol_id in good_ids:
+                sum_w, sum_val = 0,0
+                prec = min([self.metrics[p][0]['precision']
+                            for p in self.deriv_props[prop].keys()])
+                for calc_prop, (weight,shift) in self.deriv_props[prop].items():
+                    calc_prop_id = self.calc_props.index(calc_prop)
+                    sum_val += (Yp[mol_id][calc_prop_id] + shift) * weight
+                    sum_w += weight
+                value = sum_val / sum_w
+                deriv_vals.append(value)
+            out[prop] = np.array(deriv_vals).round(prec)
             
         pd.DataFrame(out).to_csv(output_file, index=False)
-        print('Wrote output csv file')
         return out
         
         

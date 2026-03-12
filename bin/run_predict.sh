@@ -4,6 +4,8 @@ usage()
 {
   echo "Usage: bin/run_predict.sh
   		[ -b | --batch-size]   Batch size.
+		[ -n | --image-name]   Docker image name
+		       		       (optional, default: drugform/uniqsar_standalone)
 		[ -m | --model-name]   Which model to use in prediction.
                 [ -i | --input-file]   Path to csv file with data to predict.
                 [ -o | --output-file]  Where to write prediction values,
@@ -18,8 +20,9 @@ usage()
 	Other paths may be relative."
 }
 
-opts=$(getopt -o b:g:m:i:o:d \
-	      -l batch-size:,gpus:,model-name:,input-file:,output-file:,dev-mode \
+image_name="drugform/uniqsar_standalone"
+opts=$(getopt -o b:n:g:m:i:o:d \
+	      -l batch-size:,image-name:,gpus:,model-name:,input-file:,output-file:,dev-mode \
 	      -n run_predict.sh \
 	      -- $@)
 
@@ -35,14 +38,15 @@ dev="no"
 gpus=""
 while true; do
     case $1 in
-    -b|--batch-size)  batch_size=$2 ;shift;;
-    -g|--gpus)        gpus=$2 ;shift;;
-    -m|--model-name)  model_name=$2 ;shift;;
-    -i|--input-file)  input_file=$2 ;shift;;
-    -o|--output-file) output_file=$2 ;shift;;
-    -d|--dev-mode)    dev="yes";;
-    --) shift; break;;
-    *) usage; exit 1;;
+	-b|--batch-size)  batch_size=$2 ;shift;;
+	-n|--image-name)  image_name=$2; shift;;
+	-g|--gpus)        gpus=$2 ;shift;;
+	-m|--model-name)  model_name=$2 ;shift;;
+	-i|--input-file)  input_file=$2 ;shift;;
+	-o|--output-file) output_file=$2 ;shift;;
+	-d|--dev-mode)    dev="yes";;
+	--) shift; break;;
+	*) usage; exit 1;;
     esac
     shift
 done   
@@ -60,6 +64,7 @@ check_arg ()
 }
 
 check_arg batch_size
+check_arg image_name
 check_arg model_name
 check_arg input_file
 check_arg output_file
@@ -68,10 +73,11 @@ set -eu
 
 if test "$dev" = "yes"
 then
-    echo "Interactive mode"
+    echo "Interactive mode (building local image)"
     iflag="-i"
     dflag=""
-    docker build -t uniqsar .
+    image_name="uniqsar_standalone:local"
+    docker build -t $image_name .
 else
     iflag=""
     dflag="-d"
@@ -97,7 +103,7 @@ command="docker run $dflag
      -e MKL_NUM_THREADS=4
      -u $(id -u):$(id -g)
      --gpus \"device=${gpus}\"
-     -it uniqsar
+     -it $image_name
      python $iflag -u predict.py
          $model_name
          /tmp/predict_input.csv
