@@ -1,0 +1,7 @@
+,Total
+similarity (RMSE),0.02781 ± 0.00007
+similarity (Q2),0.98
+similarity (CI),0.98
+avg_regr (RMSE),0.02781 ± 0.00007
+avg_regr (Q2),0.98
+avg_regr (CI),0.98
