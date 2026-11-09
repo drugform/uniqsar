@@ -54,3 +54,18 @@ class PositionalEncoding(nn.Module):
         
     def forward(self, x):
         return x + Variable(self.pe[:, :x.size(1)], requires_grad=False)
+
+class MLP (nn.Sequential):
+    def __init__(self, indim, hiddims, dropout):
+        layers = []
+        layers.append(nn.LayerNorm(indim))
+        for dim in hiddims[:-1]:
+            layers.append(nn.Linear(indim, dim))
+            layers.append(nn.ReLU(inplace=True))
+            layers.append(nn.LayerNorm(dim))
+            layers.append(nn.Dropout(dropout, inplace=False))
+            indim = dim
+
+        layers.append(nn.Linear(indim, hiddims[-1]))
+
+        super().__init__(*layers)
